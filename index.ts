@@ -11,6 +11,7 @@ import session from "express-session";
 // Routes imports
 import authRoutes from "./routers/auth.routes";
 import uploadRoutes from "./routers/upload.routes";
+import userRoutes from "./routers/user.routes";
 
 // Load environment variables
 dotenv.config();
@@ -57,6 +58,7 @@ setupSwagger(app);
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/user", userRoutes);
 
 // Root endpoint for testing
 app.get("/", (req: Request, res: Response) => {

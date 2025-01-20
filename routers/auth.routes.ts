@@ -6,9 +6,19 @@ import {
   login,
   logout,
   register,
+  updateProfile,
 } from "../controllers/auth.controller";
+import { verifyToken } from "../middleware/verifyToken";
 
 const router = express.Router();
+
+router.post("/register", register);
+router.post("/login", login);
+router.post("/logout", logout);
+router.get("/getMe", getMe);
+router.get("/google", googleAuth);
+router.get("/google/callback", googleAuthCallback);
+router.put("/user/:id", verifyToken, updateProfile);
 
 /**
  * @swagger
@@ -289,11 +299,128 @@ const router = express.Router();
  *                   example: Internal server error!
  */
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/logout", logout);
-router.get("/getMe", getMe);
-router.get("/google", googleAuth);
-router.get("/google/callback", googleAuthCallback);
+/**
+ * @swagger
+ * /api/auth/user/{id}:
+ *   put:
+ *     summary: Update user profile
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the user to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 description: Full name of the user
+ *               avatar:
+ *                 type: string
+ *                 description: Avatar URL of the user
+ *             required:
+ *               - fullname
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Profile updated successfully!
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: 64f87cb4e123456789abc123
+ *                     fullname:
+ *                       type: string
+ *                       example: John Doe
+ *                     avatar:
+ *                       type: string
+ *                       example: https://example.com/avatar.jpg
+ *       400:
+ *         description: Bad request (e.g., missing parameters)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Missing parameters!
+ *       401:
+ *         description: Unauthorized (e.g., missing or invalid token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Authentication required!
+ *       403:
+ *         description: Forbidden (e.g., invalid or expired token)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Invalid or expired token!
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: User not found!
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error!
+ */
 
 export default router;

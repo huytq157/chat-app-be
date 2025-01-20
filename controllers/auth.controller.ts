@@ -208,6 +208,100 @@ export const getMe = async (
   }
 };
 
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    const { email, ...updateData } = req.body;
+
+    const updatedUser = await UserModel.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    if (!updatedUser) {
+      res.status(404).json({
+        success: false,
+        message: "User không tồn tại!",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Cập nhật thành công!",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ!",
+    });
+  }
+};
+
+export const getAllUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { page = 1, limit = 10, q = "" } = req.query;
+
+    // Chuyển đổi `page` và `limit` thành số nguyên
+    const pageNumber = parseInt(page as string, 10);
+    const limitNumber = parseInt(limit as string, 10);
+
+    // Tạo điều kiện tìm kiếm
+    const searchQuery = q
+      ? {
+          $or: [
+            { fullname: { $regex: q, $options: "i" } }, // Tìm kiếm theo fullname
+            { email: { $regex: q, $options: "i" } }, // Tìm kiếm theo email
+          ],
+        }
+      : {};
+
+    // Tính toán tổng số người dùng
+    const totalUsers = await UserModel.countDocuments(searchQuery);
+
+    // Lấy dữ liệu người dùng với phân trang
+    const users = await UserModel.find(searchQuery, "-password")
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    if (!users || users.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Không có người dùng nào!",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Lấy danh sách người dùng thành công!",
+      data: {
+        users,
+        total: totalUsers,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: Math.ceil(totalUsers / limitNumber),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ!",
+    });
+  }
+};
+
 export const googleAuth = passport.authenticate("google", {
   scope: ["profile", "email"],
 });
