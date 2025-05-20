@@ -1,5 +1,3 @@
-
-
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -21,13 +19,13 @@ export const verifyToken = async (
       success: false,
       message: "Authentication required!",
     });
-    return; 
+    return; // Đảm bảo hàm không tiếp tục thực thi
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    (req as any).userId = decoded.userId; 
-    next(); 
+    (req as any).userId = decoded.userId;
+    next();
   } catch (error) {
     res.status(403).json({
       success: false,

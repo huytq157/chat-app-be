@@ -87,3 +87,42 @@ export const uploadFiles = async (
       .json({ success: false, message: "File upload failed.", error });
   }
 };
+
+export const getFile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { fileId } = req.params;
+
+    if (!fileId) {
+      res.status(400).json({ success: false, message: "File ID is required." });
+      return;
+    }
+
+    // Lấy thông tin file từ Google Drive
+    const file = await drive.files.get({
+      fileId: fileId,
+      fields: "id, name, mimeType, webViewLink, webContentLink",
+    });
+
+    if (!file.data) {
+      res.status(404).json({ success: false, message: "File not found." });
+      return;
+    }
+
+    // Trả về thông tin file
+    res.status(200).json({
+      success: true,
+      file: {
+        fileId: file.data.id,
+        fileName: file.data.name,
+        mimeType: file.data.mimeType,
+        webViewLink: file.data.webViewLink,
+        webContentLink: file.data.webContentLink,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error getting file:", error.message || error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to get file.", error });
+  }
+};
