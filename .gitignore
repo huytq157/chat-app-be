@@ -9,3 +9,5 @@ dist
 .env
 .env.production
 node_modules
+cred.json
+./cred.json
