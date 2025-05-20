@@ -7,7 +7,6 @@ import passport from "passport";
 import rateLimit from 'express-rate-limit';
 dotenv.config();
 
-// Extend Express Request type to include user
 declare global {
   namespace Express {
     interface User extends IUser {}
@@ -21,8 +20,8 @@ if (!JWT_SECRET) {
 }
 
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 phút
-  max: 5 // giới hạn 5 lần đăng nhập
+  windowMs: 15 * 60 * 1000, 
+  max: 10 
 });
 
 export const register = async (
@@ -483,7 +482,7 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
 
     // Kiểm tra thông tin đăng nhập admin cố định
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin@123";
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "12345678";
 
     if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
       res.status(401).json({
