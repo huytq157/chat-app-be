@@ -2,6 +2,10 @@
 /.env
 /.env.production
 
+dist
+./dist
+/dist
+
 .env
 .env.production
 node_modules
