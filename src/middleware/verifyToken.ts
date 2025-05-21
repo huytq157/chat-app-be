@@ -1,10 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env";
+import { IUser } from "../models/users.models";
+import mongoose from "mongoose";
 
-const JWT_SECRET = process.env.PASSJWT;
+const JWT_SECRET = env.PASSJWT;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is not set");
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface User extends IUser {
+      _id: mongoose.Types.ObjectId;
+    }
+  }
 }
 
 export const verifyToken = async (
@@ -19,17 +27,38 @@ export const verifyToken = async (
       success: false,
       message: "Authentication required!",
     });
-    return; // Đảm bảo hàm không tiếp tục thực thi
+    return;
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    (req as any).userId = decoded.userId;
+    const userId = new mongoose.Types.ObjectId(decoded.userId);
+
+    // Set user in request
+    req.user = {
+      _id: userId,
+    } as Express.User;
+
     next();
   } catch (error) {
     res.status(403).json({
       success: false,
       message: "Invalid or expired token!",
     });
+  }
+};
+
+export const verifySocketToken = async (
+  token: string
+): Promise<{ userId: string }> => {
+  if (!token) {
+    throw new Error("Authentication required!");
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    return decoded;
+  } catch (error) {
+    throw new Error("Invalid or expired token!");
   }
 };

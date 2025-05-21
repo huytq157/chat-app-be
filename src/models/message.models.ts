@@ -229,7 +229,9 @@ const MessageSchema: Schema<IMessage> = new mongoose.Schema(
         },
         coordinates: {
           type: [Number],
-          required: true,
+          required: function () {
+            return this.type === "location";
+          },
         },
         name: String,
         address: String,
@@ -244,12 +246,16 @@ const MessageSchema: Schema<IMessage> = new mongoose.Schema(
         type: {
           type: String,
           enum: ["voice", "video"],
-          required: true,
+          required: function () {
+            return this.type === "call";
+          },
         },
         status: {
           type: String,
           enum: ["missed", "answered", "rejected", "busy"],
-          required: true,
+          required: function () {
+            return this.type === "call";
+          },
         },
         duration: Number,
         startTime: Date,
@@ -395,4 +401,4 @@ MessageSchema.index({ "content.poll.endTime": 1 });
 MessageSchema.index({ scheduledFor: 1 });
 MessageSchema.index({ expiresAt: 1 });
 
-export const MessageModel = mongoose.model<IMessage>("Message", MessageSchema);
+export const Message = mongoose.model<IMessage>("Message", MessageSchema);

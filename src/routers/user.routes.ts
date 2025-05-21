@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyAdmin } from "../middleware/verifyAdmin";
+
 import { getAllUser } from "../controllers/users.controller";
 
 const router = express.Router();
@@ -137,6 +137,6 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.get("/list-users", verifyAdmin, getAllUser);
+router.get("/list-users", getAllUser);
 
 export default router;
