@@ -1,4 +1,3 @@
-
 import express, { Request, Response, NextFunction } from "express";
 import { UserModel } from "../models/users.models";
 
@@ -8,14 +7,14 @@ export const getAllUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { 
-      page = 1, 
-      limit = 10, 
+    const {
+      page = 1,
+      limit = 10,
       q = "",
       status,
       gender,
       sortBy = "lastSeen",
-      sortOrder = "desc"
+      sortOrder = "desc",
     } = req.query;
 
     // Chuyển đổi các tham số
@@ -25,7 +24,7 @@ export const getAllUser = async (
 
     // Xây dựng điều kiện tìm kiếm
     const searchQuery: any = {
-      isDeleted: false
+      isDeleted: false,
     };
 
     // Tìm kiếm theo từ khóa
@@ -34,7 +33,7 @@ export const getAllUser = async (
         { username: { $regex: q, $options: "i" } },
         { fullname: { $regex: q, $options: "i" } },
         { email: { $regex: q, $options: "i" } },
-        { bio: { $regex: q, $options: "i" } }
+        { bio: { $regex: q, $options: "i" } },
       ];
     }
 
@@ -71,7 +70,7 @@ export const getAllUser = async (
     }
 
     // Format dữ liệu trả về
-    const formattedUsers = users.map(user => ({
+    const formattedUsers = users.map((user) => ({
       id: user._id,
       username: user.username,
       fullname: user.fullname,
@@ -88,14 +87,11 @@ export const getAllUser = async (
       settings: {
         theme: user.settings.theme,
         language: user.settings.language,
-        fontSize: user.settings.fontSize
+        fontSize: user.settings.fontSize,
       },
       socialLinks: user.socialLinks,
-      badges: user.badges
+      badges: user.badges,
     }));
-
-    console.log("formattedUsers", formattedUsers);
-    
 
     res.status(200).json({
       success: true,
@@ -106,9 +102,9 @@ export const getAllUser = async (
           total: totalUsers,
           page: pageNumber,
           limit: limitNumber,
-          totalPages: Math.ceil(totalUsers / limitNumber)
-        }
-      }
+          totalPages: Math.ceil(totalUsers / limitNumber),
+        },
+      },
     });
   } catch (error) {
     console.error("Error fetching all users:", error);

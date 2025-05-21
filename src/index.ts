@@ -1,30 +1,35 @@
+import { env } from "./config/env";
 import express, { Express, Request, Response, Application } from "express";
-import dotenv from "dotenv";
-// import connectDatabase from "../config/database";
-// import { setupSwagger } from "../config/swagger";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import passport from "passport";
 import session from "express-session";
+import { createServer } from "http";
+import { initializeSocket } from "./socket";
 
 // Routes imports
 import authRoutes from "./routers/auth.routes";
 import uploadRoutes from "./routers/upload.routes";
 import userRoutes from "./routers/user.routes";
+import messageRoutes from "./routers/message.routes";
+import ConversationRoutes from "./routers/conversation.routes";
 import connectDatabase from "./config/database";
 import { setupSwagger } from "./config/swagger";
-
-// Load environment variables
-dotenv.config();
 
 // Create an express application instance
 const app: Application = express();
 
+// Create HTTP server
+const server = createServer(app);
+
+// Initialize Socket.IO
+initializeSocket(server);
+
 // Middleware for CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -79,6 +84,8 @@ setupSwagger(app);
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/conversation", ConversationRoutes);
 
 // Root endpoint for testing
 app.get("/", (req: Request, res: Response) => {
@@ -86,7 +93,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Start the server
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+server.listen(env.PORT, () => {
+  console.log(`Server is running at http://localhost:${env.PORT}`);
 });

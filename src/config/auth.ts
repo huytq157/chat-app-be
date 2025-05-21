@@ -1,6 +1,16 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { UserModel } from "../models/users.models";
+import { UserModel, IUser } from "../models/users.models";
+import { Types, Document } from "mongoose";
+
+type UserDocument = Document<unknown, {}, IUser> &
+  IUser & { _id: Types.ObjectId };
+
+declare global {
+  namespace Express {
+    interface User extends UserDocument {}
+  }
+}
 
 passport.use(
   new GoogleStrategy(
@@ -28,7 +38,7 @@ passport.use(
           }
         }
 
-        return done(null, user);
+        return done(null, user as UserDocument);
       } catch (err) {
         return done(err, false);
       }
@@ -36,14 +46,14 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => {
+passport.serializeUser((user: Express.User, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await UserModel.findById(id);
-    done(null, user);
+    done(null, user as UserDocument);
   } catch (err) {
     done(err, null);
   }
