@@ -100,7 +100,9 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.googleId;
+      },
       unique: true,
       trim: true,
       minlength: 3,
@@ -124,7 +126,9 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.googleId;
+      },
       minlength: 6,
     },
     avatar: {
