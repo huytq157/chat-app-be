@@ -23,17 +23,12 @@ export class MessageController {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit))
-<<<<<<< Updated upstream
-        .populate("sender", "username avatar")
-        .populate("replyTo");
-=======
         .populate("sender", "fullname avatar")
         .populate("replyTo")
         .populate({
           path: "readBy.user",
           select: "fullname avatar",
         });
->>>>>>> Stashed changes
 
       const total = await Message.countDocuments({
         conversation: conversationId,
@@ -116,11 +111,7 @@ export class MessageController {
       // Cập nhật tin nhắn cuối cùng của cuộc trò chuyện
       conversation.lastMessage = message._id as mongoose.Types.ObjectId;
       await conversation.save();
-<<<<<<< Updated upstream
-      console.log("Updated conversation last message");
-=======
       await message.populate("sender", "fullname avatar");
->>>>>>> Stashed changes
 
       // Populate thông tin người gửi
       await message.populate("sender", "username avatar");

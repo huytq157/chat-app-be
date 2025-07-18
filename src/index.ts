@@ -7,11 +7,8 @@ import passport from "passport";
 import session from "express-session";
 import { createServer } from "http";
 import { initializeSocket } from "./socket";
-<<<<<<< Updated upstream
-=======
 import { connectRedis } from "./config/redis";
 import "./config/auth";
->>>>>>> Stashed changes
 
 // Routes imports
 import authRoutes from "./routers/auth.routes";
