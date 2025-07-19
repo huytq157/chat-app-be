@@ -7,9 +7,10 @@ import passport from "passport";
 import session from "express-session";
 import { createServer } from "http";
 import { initializeSocket } from "./socket";
-
+import dotenv from "dotenv";
 import "./config/auth";
 
+dotenv.config();
 // Routes imports
 import authRoutes from "./routers/auth.routes";
 import uploadRoutes from "./routers/upload.routes";
