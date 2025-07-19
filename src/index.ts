@@ -7,7 +7,7 @@ import passport from "passport";
 import session from "express-session";
 import { createServer } from "http";
 import { initializeSocket } from "./socket";
-import { connectRedis } from "./config/redis";
+
 import "./config/auth";
 
 // Routes imports
